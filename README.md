@@ -9,6 +9,7 @@ Este projeto gera uma imagem PNG com fundo transparente contendo texto utilizand
 - Pillow
 - Tkinter
 - PyInstaller (para gerar executáveis)
+- Um arquivo de fonte .ttf [como esses](https://www.dafont.com/ttf.d592)
 
 ## Instalação
 
@@ -33,7 +34,7 @@ pip install pillow
 python txtgen.py <text_size> <text> <font_path> <color> [--output_dir <output_dir>]
 ```
 
-Exemplo:
+Exemplo (aqui eu baixei a fonte [Cloister Black](https://www.dafont.com/pt/cloister-black.font) e deixei na mesma pasta que o arquivo python):
 
 ```sh
 python txtgen.py 64 "Hello, World!" "CloisterBlack.ttf" black
@@ -48,6 +49,11 @@ python window.py
 ```
 
 2. Preencha os campos necessários e clique em "Generate Image" para criar a imagem.
+
+# Exemplos de imagens geradas
+![Demo - Cloister Black - Azul](Generated Images/CloisterBlack-Demo-#0080ff.png)
+![THE GLORIOUS - Cloister Black - Branco](Generated Images/CloisterBlack-THE GLORIOUS-white.png)
+![THE GLORIOUS - Cloister Black - Preto](Generated Images/CloisterBlack-THE GLORIOUS-black.png)
 
 ## Gerando Executáveis
 
@@ -75,9 +81,4 @@ pyinstaller --onefile --windowed window.py
 
 ## Links de Download
 
-- [Download do executável para Windows](link-para-download-windows)
-- [Download do executável para macOS](link-para-download-macos)
-
-## Licença
-
-Este projeto está licenciado sob a [MIT License](LICENSE).
+- [Download do executável para Windows](https://github.com/SafeMantella/Fontastic-Text-Image-Generator/releases/download/App/Fontastic.exe)
