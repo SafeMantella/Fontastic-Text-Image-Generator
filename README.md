@@ -51,9 +51,9 @@ python window.py
 2. Preencha os campos necessários e clique em "Generate Image" para criar a imagem.
 
 # Exemplos de imagens geradas
-<img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-Demo-%230080ff.png" alt="Texto alternativo" height="64"/>
-![THE GLORIOUS - Cloister Black - Branco](https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-THE%20GLORIOUS-white.png)
-![THE GLORIOUS - Cloister Black - Preto](https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-THE%20GLORIOUS-black.png)
+<img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-Demo-%230080ff.png" height="64"/>
+<img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-THE%20GLORIOUS-white.png" height="64"/>
+<img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-THE%20GLORIOUS-black.png" height="64"/>
 
 
 ## Gerando Executáveis
