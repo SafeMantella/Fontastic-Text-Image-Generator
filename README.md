@@ -3,7 +3,11 @@
 
 Este script gera uma imagem PNG com fundo transparente contendo texto em um tamanho especificado e usando uma fonte TTF especificada.
 
-## Pré-requisitos
+## Rodando o programa
+
+
+
+## Testando o código
 
 Certifique-se de ter o Python e o `pip` instalados. Você também precisa instalar a biblioteca `Pillow`.
 
