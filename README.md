@@ -31,7 +31,7 @@ pip install pillow
 1. Para gerar uma imagem diretamente pelo terminal, execute o script `txtgen.py` com os argumentos necessários.
 
 ```sh
-python txtgen.py <text_size> <text> <font_path> <color> [--output_dir <output_dir>]
+python txtgen.py <text_size> <text> <font_path> <color> [--invert]
 ```
 
 Exemplo (aqui eu baixei a fonte [Cloister Black](https://www.dafont.com/pt/cloister-black.font) e deixei na mesma pasta que o arquivo python):
