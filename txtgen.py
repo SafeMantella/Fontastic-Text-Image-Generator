@@ -2,7 +2,14 @@ import argparse
 from PIL import Image, ImageDraw, ImageFont
 import os
 
-def create_image(text_size, text, font_path, color, output_dir):
+def create_image(text_size, text, font_path, color, invert):
+    # background transparente
+    background = (255, 255, 255, 0)
+
+    # se invert for True, a cor do texto será a cor de fundo e a cor de fundo será a cor do texto
+    if invert:
+        color, background = background, color
+
     font = ImageFont.truetype(font_path, text_size) # Carrega a fonte
 
     # Cria uma imagem temporária para medir o tamanho do texto
@@ -11,11 +18,11 @@ def create_image(text_size, text, font_path, color, output_dir):
     width, height = draw.textbbox((0, 0), text, font=font)[2:4] # Mede o tamanho do texto
 
     # Cria uma imagem com fundo transparente
-    image = Image.new("RGBA", (width, height), (255, 255, 255, 0)) # Imagem com fundo transparente
+    image = Image.new("RGBA", (width, height), background) # Imagem com fundo transparente
     draw = ImageDraw.Draw(image) # Cria um objeto para desenhar na imagem
 
     # Desenha o texto na imagem
-    draw.text((0, 0), text, font=font, fill=color)
+    draw.text((0, 0), text, font=font, fill=color)# (0, 0) é a posição do texto
 
     # Nome do arquivo de saída
     output_file = f"{os.path.splitext(os.path.basename(font_path))[0]}-{text}-{color}.png"
@@ -40,9 +47,12 @@ def create_image(text_size, text, font_path, color, output_dir):
             os.makedirs(os.path.join(os.path.expanduser("~"), "Pictures", "Fontastic"))
         output_path = os.path.join(os.path.expanduser("~"), "Pictures", "Fontastic", output_file)
 
+    if invert:
+        output_path = output_path.replace(".png", "-inverted.png")
+
     # Salva a imagem
     image.save(output_path)
-
+    
     return(f"Imagem salva em: {output_path}")
 
 if __name__ == "__main__":
