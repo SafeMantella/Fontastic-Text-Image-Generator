@@ -53,7 +53,7 @@ python window.py
 # Exemplos de imagens geradas
 <img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-Demo-%230080ff.png" height="64"/>
 <img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-THE%20GLORIOUS-white.png" height="64"/>
-<img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-THE%20GLORIOUS-black.png" height="64"/>
+<img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/db2ffaeaaf6507a926a026250045620a27aa9963/Generated%20Images/Tomato%20Regular-ASTROWORLD-(255%2C%20255%2C%20255%2C%200)-inverted.png" height="64"/>
 
 ## Gerando Executáveis
 
