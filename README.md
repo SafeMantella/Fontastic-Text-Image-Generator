@@ -78,7 +78,3 @@ pyinstaller --onefile --windowed window.py
 ```
 
 3. O executável será gerado na pasta `dist`.
-
-## Links de Download
-
-- [Download do executável para Windows](https://github.com/SafeMantella/Fontastic-Text-Image-Generator/releases/download/App/Fontastic.exe)
