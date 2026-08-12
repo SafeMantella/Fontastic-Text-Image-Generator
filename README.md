@@ -1,105 +1,48 @@
 # Text Image Generator
 
-Este projeto gera uma imagem PNG com fundo transparente contendo texto utilizando uma fonte TTF. Ele inclui uma interface gráfica para facilitar a navegação.
+Este projeto gera uma imagem PNG com fundo transparente contendo texto utilizando uma fonte TTF, via linha de comando (`txtgen.py`).
+
+Baseado em [SafeMantella/Fontastic-Text-Image-Generator](https://github.com/SafeMantella/Fontastic-Text-Image-Generator), com os fixes descritos na seção abaixo já aplicados direto no `txtgen.py` (o script original tinha 3 bugs — output_dir ignorado, sem suporte a hex, sem suporte a variable fonts — e uma GUI em Tkinter que dependia de uma assinatura de função antiga; a GUI foi removida daqui porque o pipeline real usa só terminal/agente, ver seção "Por que isso é útil pra agentes de IA").
 
 ## Requisitos
 
 - Python 3.x
 - Pillow
-- Tkinter
-- PyInstaller (para gerar executáveis)
 - Um arquivo de fonte .ttf [como esses](https://www.dafont.com/ttf.d592)
 
 ## Instalação
-
-1. Clone o repositório ou baixe os arquivos `window.py` e `txtgen.py`.
-
-```sh
-git clone https://github.com/SafeMantella/Fontastic-Text-Image-Generator.git
-cd Fontastic-Text-Image-Generator
-```
-
-2. Instale as dependências necessárias.
 
 ```sh
 pip install pillow
 ```
 
-## Uso via Terminal
-
-1. Para gerar uma imagem diretamente pelo terminal, execute o script `txtgen.py` com os argumentos necessários.
+## Uso
 
 ```sh
-python txtgen.py <text_size> <text> <font_path> <color> [--invert]
+python txtgen.py <text_size> "<texto>" <font_path> <cor> <output_path> [--weight N] [--instance NOME] [--bg transparent|hex] [--padding N]
 ```
 
-Exemplo (aqui eu baixei a fonte [Cloister Black](https://www.dafont.com/pt/cloister-black.font) e deixei na mesma pasta que o arquivo python):
-
+Exemplo (título em Sora peso 500, cor hex, fundo transparente):
 ```sh
-python txtgen.py 64 "Hello, World!" "CloisterBlack.ttf" black
+python txtgen.py 120 "PEDRO ARFUX" fonts/Sora-Variable.ttf "#F7F5F0" out/titulo.png --weight 500
 ```
-
-## Uso via Interface Gráfica
-
-1. Execute o script `window.py` para abrir a interface gráfica.
-
-```sh
-python window.py
-```
-
-2. Preencha os campos necessários e clique em "Generate Image (Color on text)" para criar a imagem com texto colorido em fundo transparente, ou "Generate Image (Color on Backgound)" para criar a imagem com texto transparente em fundo colorido.
 
 # Exemplos de imagens geradas
 <img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-Demo-%230080ff.png" height="64"/>
 <img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/2b33d7fd9233909c8fdf224e0f4092fb5953484d/Generated%20Images/CloisterBlack-THE%20GLORIOUS-white.png" height="64"/>
 <img src="https://github.com/SafeMantella/Fontastic-Text-Image-Generator/blob/db2ffaeaaf6507a926a026250045620a27aa9963/Generated%20Images/Tomato%20Regular-ASTROWORLD-(255%2C%20255%2C%20255%2C%200)-inverted.png" height="64"/>
 
-## Gerando Executáveis
-
-### Windows
-
-1. Abra o Prompt de Comando ou PowerShell e navegue até o diretório do projeto.
-2. Execute o comando para criar o executável:
-
-```sh
-pyinstaller --onefile --windowed window.py
-```
-
-3. O executável será gerado na pasta `dist`.
-
-### macOS
-
-1. Abra o Terminal e navegue até o diretório do projeto.
-2. Execute o comando para criar o executável:
-
-```sh
-pyinstaller --onefile --windowed window.py
-```
-
-3. O executável será gerado na pasta `dist`.
-
 ---
 
-## `txtgen_fixed.py` — versão corrigida e estendida (2026)
+## Histórico: bugs corrigidos em relação ao script original
 
-O `txtgen.py` original tem 3 bugs que atrapalham o uso real via terminal/automação:
+O patch em `patch/0001-...patch` tem o diff completo. Resumo dos 3 bugs do `txtgen.py` original (SafeMantella) que foram corrigidos direto neste `txtgen.py`:
 
-1. **`--output_dir` nunca era realmente usado.** O bloco `__main__` chamava `create_image(args.text_size, args.text, args.font_path, args.color, args.output_dir)` — mas a assinatura da função é `create_image(text_size, text, font_path, color, invert)`. Ou seja, o valor de `output_dir` era passado no lugar de `invert`, e a imagem sempre ia parar em `~/Pictures/Fontastic` ou `~/Images/Fontastic`, nunca onde o `--output_dir` pedia.
+1. **`--output_dir` nunca era realmente usado.** O bloco `__main__` chamava `create_image(args.text_size, args.text, args.font_path, args.color, args.output_dir)` — mas a assinatura da função era `create_image(text_size, text, font_path, color, invert)`. Ou seja, o valor de `output_dir` era passado no lugar de `invert`, e a imagem sempre ia parar em `~/Pictures/Fontastic` ou `~/Images/Fontastic`, nunca onde o `--output_dir` pedia.
 2. **Só aceitava nomes de cor do Pillow** (`black`, `white`, `red`...), não hex (`#1E3A47`) — inviável pra trabalhar com uma paleta de marca definida em hex.
 3. **Sem suporte a variable fonts.** Fontes modernas do Google Fonts (Sora, Inter, etc.) costumam vir como variable font de eixo único `wght` num arquivo só, em vez de um arquivo por peso. `ImageFont.truetype()` sozinho carrega sempre a instância default — pra pegar um peso específico (ex: 500/Medium) é preciso `font.set_variation_by_axes([peso])` ou `font.set_variation_by_name("Medium")`, que o script original não fazia.
 
-`txtgen_fixed.py` corrige os três, mantendo a mesma ideia (texto → PNG transparente com uma fonte TTF qualquer):
-
-```sh
-python txtgen_fixed.py <text_size> "<texto>" <font_path> <cor> <output_path> [--weight N] [--instance NOME] [--bg transparent|hex] [--padding N]
-```
-
-Exemplo (título em Sora peso 500, cor hex, fundo transparente):
-```sh
-python txtgen_fixed.py 120 "PEDRO ARFUX" fonts/Sora-Variable.ttf "#F7F5F0" out/titulo.png --weight 500
-```
-
-`window.py` (a GUI) continua valendo como está — os fixes são só na ponta de terminal, que é a que faz sentido pra automação/agentes.
+A GUI original (`window.py`, Tkinter) foi removida — o pipeline real usa só terminal/agente (ver seção abaixo), e a GUI dependia da assinatura antiga de `create_image()`.
 
 ---
 

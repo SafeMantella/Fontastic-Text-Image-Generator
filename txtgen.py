@@ -1,71 +1,95 @@
+"""
+txtgen_fixed.py — versão corrigida/estendida do txtgen.py original
+(https://github.com/SafeMantella/Fontastic-Text-Image-Generator)
+
+O script original tinha 3 bugs que impediam uso confiável via terminal:
+1. create_image() ignorava o --output_dir (o main chamava create_image(..., args.output_dir)
+   passando a pasta no lugar do parâmetro `invert`).
+2. Só aceitava nomes de cor do Pillow (black, white, red...), não hex (#1E3A47).
+3. Sem suporte a variable fonts (Sora e Inter da Google Fonts vêm como variable font
+   de eixo único `wght` — precisa selecionar a instância/peso via set_variation_by_axes).
+
+Uso:
+    python txtgen_fixed.py <text_size> "<texto>" <font_path> <cor> <output_path> [--weight N] [--bg TRANSPARENT|hex]
+
+Exemplo (título do banner, Sora peso 500, âmbar):
+    python txtgen_fixed.py 120 "PEDRO ARFUX" fonts/Sora-Variable.ttf "#F7F5F0" out/titulo.png --weight 500
+"""
 import argparse
-from PIL import Image, ImageDraw, ImageFont
 import os
+from PIL import Image, ImageDraw, ImageFont
 
-def create_image(text_size, text, font_path, color, invert):
-    # background transparente
-    background = (255, 255, 255, 0)
 
-    # se invert for True, a cor do texto será a cor de fundo e a cor de fundo será a cor do texto
-    if invert:
-        color, background = background, color
+def parse_color(c):
+    """Aceita 'transparent', nome do Pillow, ou hex (#RRGGBB / #RRGGBBAA)."""
+    if c.lower() == "transparent":
+        return (255, 255, 255, 0)
+    if c.startswith("#"):
+        h = c.lstrip("#")
+        if len(h) == 6:
+            r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+            return (r, g, b, 255)
+        if len(h) == 8:
+            r, g, b, a = (int(h[i:i + 2], 16) for i in (0, 2, 4, 6))
+            return (r, g, b, a)
+    return c  # nome do Pillow (black, white, red, etc.)
 
-    font = ImageFont.truetype(font_path, text_size) # Carrega a fonte
 
-    # Cria uma imagem temporária para medir o tamanho do texto
-    dummy_image = Image.new("RGBA", (1, 1)) # Imagem de 1x1 pixel
-    draw = ImageDraw.Draw(dummy_image) # Cria um objeto para desenhar na imagem
-    width, height = draw.textbbox((0, 0), text, font=font)[2:4] # Mede o tamanho do texto
+def load_font(font_path, size, weight=None, instance_name=None):
+    font = ImageFont.truetype(font_path, size)
+    try:
+        axes = font.get_variation_axes()
+    except Exception:
+        axes = None  # fonte estática, não é variable font
 
-    # Cria uma imagem com fundo transparente
-    image = Image.new("RGBA", (width, height), background) # Imagem com fundo transparente
-    draw = ImageDraw.Draw(image) # Cria um objeto para desenhar na imagem
+    if axes:
+        if instance_name:
+            font.set_variation_by_name(instance_name)
+        elif weight:
+            # assume eixo único 'wght' (caso do Sora e do Inter usados neste projeto)
+            font.set_variation_by_axes([weight])
+    return font
 
-    # Desenha o texto na imagem
-    draw.text((0, 0), text, font=font, fill=color)# (0, 0) é a posição do texto
 
-    # Nome do arquivo de saída
-    output_file = f"{os.path.splitext(os.path.basename(font_path))[0]}-{text}-{color}.png"
-    # output_path = os.path.join(output_dir, output_file)
+def create_image(text_size, text, font_path, color, output_path, weight=None,
+                  instance_name=None, bg="transparent", padding=0):
+    fill = parse_color(color)
+    background = parse_color(bg)
 
-    # output_path deve ser a pasta onde ficam as imagens, independente do sistema operacional
-    # windows: C:\Users\usuario\Pictures\Fontastic
-    # linux: /home/usuario/Images/Fontastic
-    # mac: /Users/usuario/Pictures/Fontastic
-    # se pasta não existir, criar
+    font = load_font(font_path, text_size, weight=weight, instance_name=instance_name)
 
-    if os.name == 'nt':
-        if not os.path.exists(os.path.join(os.path.expanduser("~"), "Pictures", "Fontastic")):
-            os.makedirs(os.path.join(os.path.expanduser("~"), "Pictures", "Fontastic"))
-        output_path = os.path.join(os.path.expanduser("~"), "Pictures", "Fontastic", output_file)
-    elif os.name == 'posix':
-        if not os.path.exists(os.path.join(os.path.expanduser("~"), "Images", "Fontastic")):
-            os.makedirs(os.path.join(os.path.expanduser("~"), "Images", "Fontastic"))
-        output_path = os.path.join(os.path.expanduser("~"), "Images", "Fontastic", output_file)
-    else:
-        if not os.path.exists(os.path.join(os.path.expanduser("~"), "Pictures", "Fontastic")):
-            os.makedirs(os.path.join(os.path.expanduser("~"), "Pictures", "Fontastic"))
-        output_path = os.path.join(os.path.expanduser("~"), "Pictures", "Fontastic", output_file)
+    dummy = Image.new("RGBA", (1, 1))
+    draw = ImageDraw.Draw(dummy)
+    bbox = draw.textbbox((0, 0), text, font=font)
+    width = bbox[2] - bbox[0] + padding * 2
+    height = bbox[3] - bbox[1] + padding * 2
 
-    if invert:
-        output_path = output_path.replace(".png", "-inverted.png")
+    image = Image.new("RGBA", (width, height), background)
+    draw = ImageDraw.Draw(image)
+    draw.text((padding - bbox[0], padding - bbox[1]), text, font=font, fill=fill)
 
-    # Salva a imagem
+    out_dir = os.path.dirname(output_path)
+    if out_dir and not os.path.exists(out_dir):
+        os.makedirs(out_dir)
     image.save(output_path)
-    
-    return(f"Imagem salva em: {output_path}")
+    return output_path
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Gerar uma imagem PNG com texto.')
-    parser.add_argument('text_size', type=int, help='Tamanho do texto')
-    parser.add_argument('text', type=str, help='Texto a ser renderizado')
-    parser.add_argument('font_path', type=str, help='Caminho para o arquivo de fonte TTF')
-    parser.add_argument('color', type=str, help='Cor do texto (black, white, red, green, blue, yellow, purple, orange)')
-    parser.add_argument('--output_dir', type=str, help='Diretório para salvar a imagem (padrão: Imagens)')
-    
+    parser = argparse.ArgumentParser(description="Gerar uma imagem PNG com texto (fundo transparente por padrão).")
+    parser.add_argument("text_size", type=int)
+    parser.add_argument("text", type=str)
+    parser.add_argument("font_path", type=str)
+    parser.add_argument("color", type=str, help="Nome Pillow ou hex (#RRGGBB)")
+    parser.add_argument("output_path", type=str)
+    parser.add_argument("--weight", type=int, default=None, help="Peso variável (ex: 400, 500, 700) para variable fonts")
+    parser.add_argument("--instance", type=str, default=None, help="Nome da instância nomeada (ex: Medium, Bold)")
+    parser.add_argument("--bg", type=str, default="transparent", help="'transparent' ou cor hex de fundo")
+    parser.add_argument("--padding", type=int, default=0)
+
     args = parser.parse_args()
-    
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-    
-    print(create_image(args.text_size, args.text, args.font_path, args.color, args.output_dir))
+    result = create_image(
+        args.text_size, args.text, args.font_path, args.color, args.output_path,
+        weight=args.weight, instance_name=args.instance, bg=args.bg, padding=args.padding,
+    )
+    print(f"Imagem salva em: {result}")
